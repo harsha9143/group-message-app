@@ -1,20 +1,27 @@
+//core modules
 const path = require("path");
 
+//third-party modules
 const express = require("express");
+require("dotenv").config();
+
+//local modules
+const authRouter = require("./routes/authRouter");
+const sequelize = require("./utils/dbUtil");
+const User = require("./models/user");
 
 const app = express();
 
-app.get("/sign-up", (req, res) => {
-  res.sendFile(path.join(__dirname, "views", "signup.html"));
-});
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "public")));
 
-app.get("/login", (req, res) => {
-  res.sendFile(path.join(__dirname, "views", "login.html"));
-});
+app.use("/", authRouter);
 
-const PORT = 4000;
-app.listen(PORT, () => {
-  console.log(
-    `connection eshtablished successfully http://localhost:4000/sign-up`
-  );
+sequelize.sync().then(() => {
+  app.listen(process.env.PORT, () => {
+    console.log(
+      `connection eshtablished successfully http://localhost:4000/sign-up`
+    );
+  });
 });
