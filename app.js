@@ -9,6 +9,11 @@ require("dotenv").config();
 const authRouter = require("./routes/authRouter");
 const sequelize = require("./utils/dbUtil");
 const User = require("./models/user");
+const userRouter = require("./routes/userRouter");
+const Message = require("./models/message");
+
+User.hasMany(Message);
+Message.belongsTo(User);
 
 const app = express();
 
@@ -17,6 +22,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", authRouter);
+app.use("/user", userRouter);
 
 sequelize.sync().then(() => {
   app.listen(process.env.PORT, () => {

@@ -84,7 +84,3 @@ exports.loginUser = async (req, res) => {
     res.status(500).json({ message: "Server error!! failed to login" });
   }
 };
-
-exports.userAccount = (req, res) => {
-  res.sendFile(path.join(__dirname, "../views", "chatWindow.html"));
-};
