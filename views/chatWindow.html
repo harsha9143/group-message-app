@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Group Chat</title>
+    <link rel="stylesheet" href="/css/chat.css" />
+  </head>
+  <body>
+    <div class="chat-container">
+      <div class="sidebar">
+        <h2>Group Chat</h2>
+        <ul class="user-list">
+          <li class="active">Harsha</li>
+          <li>user1</li>
+          <li>user2</li>
+          <li>user3</li>
+        </ul>
+      </div>
+
+      <div class="chat-section">
+        <div class="chat-header">
+          <h3>Global Room</h3>
+        </div>
+
+        <div class="chat-box" id="chat-box">
+          <div class="message received">
+            <p>Hello Harsha 👋</p>
+            <span class="timestamp">10:02 AM</span>
+          </div>
+          <div class="message sent">
+            <p>Hey! How's your project going?</p>
+            <span class="timestamp">10:03 AM</span>
+          </div>
+        </div>
+
+        <div class="chat-input">
+          <input
+            type="text"
+            id="messageInput"
+            placeholder="Type a message..."
+          />
+          <button id="sendBtn">Send</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="/js/chatWindow.js"></script>
+  </body>
+</html>
