@@ -80,3 +80,16 @@ sendBtn.addEventListener("click", async () => {
     input.value = "";
   }
 });
+
+const socket = new WebSocket("ws://localhost:4000");
+
+socket.onmessage = async (event) => {
+  const li = document.createElement("li");
+  li.innerText = await event.data.text();
+  chatBox.appendChild(li);
+};
+
+function send() {
+  const text = document.getElementById("msg").value;
+  socket.send(text);
+}
