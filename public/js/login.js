@@ -18,10 +18,11 @@ async function handleOnSubmit(e) {
   msg.textContent = data.message;
 
   if (loginUser.status === 200) {
+    localStorage.setItem("token", data.token);
     msg.style.color = "green";
-    // setTimeout(() => {
-    //   window.location.href = "http://localhost:4000/login";
-    // }, 1500);
+    setTimeout(() => {
+      window.location.href = "http://localhost:4000/user";
+    }, 1500);
   } else {
     msg.style.color = "red";
   }

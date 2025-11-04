@@ -1,5 +1,6 @@
 const path = require("path");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 
 exports.signupPage = (req, res) => {
@@ -78,7 +79,11 @@ exports.loginUser = async (req, res) => {
       return res.status(403).json({ message: "Incorrect Password" });
     }
 
-    res.status(200).json({ message: "Login successful" });
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY, {
+      expiresIn: process.env.JWT_EXPIRES_IN,
+    });
+
+    res.status(200).json({ message: "Login successful", token });
   } catch (error) {
     console.log("Failed to login>>>>>>", error.message);
     res.status(500).json({ message: "Server error!! failed to login" });

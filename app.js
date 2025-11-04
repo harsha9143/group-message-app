@@ -11,6 +11,7 @@ const sequelize = require("./utils/dbUtil");
 const User = require("./models/user");
 const userRouter = require("./routes/userRouter");
 const Message = require("./models/message");
+const { authenticate } = require("./middleware/authenticationToken");
 
 User.hasMany(Message);
 Message.belongsTo(User);
@@ -23,6 +24,9 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", authRouter);
 app.use("/user", userRouter);
+app.get("/verify-token", authenticate, (req, res) => {
+  res.json({ user: req.user });
+});
 
 sequelize.sync().then(() => {
   app.listen(process.env.PORT, () => {
