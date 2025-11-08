@@ -77,5 +77,5 @@ sendBtn.addEventListener("click", async () => {
 // };
 
 socket.on("message-room", (message) => {
-  display({ message, createdAt: new Date().toLocaleTimeString() });
+  display({ message, createdAt: new Date() });
 });

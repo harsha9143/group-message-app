@@ -43,7 +43,8 @@ const io = new Server(server);
 
 io.on("connection", (socket) => {
   socket.on("message-room", async (message) => {
-    await Message.create({ message, userId: 0 });
+    console.log("message");
+    await Message.create({ message, userId: 1 });
     io.emit("message-room", message);
   });
 });
