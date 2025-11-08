@@ -108,6 +108,14 @@ body {
   text-align: right;
 }
 
+.name {
+  font-size: 0.75rem;
+  color: #ec83ec;
+  margin-bottom: 5px;
+  display: block;
+  text-align: left;
+}
+
 .chat-input {
   display: flex;
   padding: 10px;

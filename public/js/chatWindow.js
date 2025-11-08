@@ -1,6 +1,5 @@
 window.addEventListener("DOMContentLoaded", () => initialize());
 const token = localStorage.getItem("token");
-const socket = io(`ws://localhost:4000`);
 
 const chatBox = document.getElementById("chat-box");
 const sendBtn = document.getElementById("sendBtn");
@@ -45,11 +44,15 @@ async function initialize() {
 function display(msg) {
   const msgDiv = document.createElement("div");
   msgDiv.classList.add("message", "sent");
-  msgDiv.innerHTML = `<p>${msg.message}</p><span class="timestamp">${new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>`;
+  msgDiv.innerHTML = `<span class="name">${msg.username}</span><p>${msg.message}</p><span class="timestamp">${new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>`;
 
   chatBox.appendChild(msgDiv);
   chatBox.scrollTop = chatBox.scrollHeight;
 }
+
+const socket = io(`ws://localhost:4000`, {
+  auth: { token },
+});
 
 sendBtn.addEventListener("click", async () => {
   const msg = input.value.trim();
@@ -77,5 +80,5 @@ sendBtn.addEventListener("click", async () => {
 // };
 
 socket.on("message-room", (message) => {
-  display({ message, createdAt: new Date() });
+  display(message);
 });
