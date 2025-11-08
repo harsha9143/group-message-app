@@ -1,5 +1,6 @@
 window.addEventListener("DOMContentLoaded", () => initialize());
 const token = localStorage.getItem("token");
+const socket = new WebSocket(`ws://localhost:4000`);
 
 const chatBox = document.getElementById("chat-box");
 const sendBtn = document.getElementById("sendBtn");
@@ -27,6 +28,7 @@ async function initialize() {
 
   document.getElementById("chat-container").style.display = "";
 
+  chatBox.innerHTML = "";
   const messages = await fetch(`http://localhost:4000/user/get-messages`, {
     headers: {
       Authorization: "Bearer " + token,
@@ -34,7 +36,6 @@ async function initialize() {
   });
 
   const messageData = await messages.json();
-  console.log(messageData);
 
   for (let i = 0; i < messageData.length; i++) {
     display(messageData[i]);
@@ -48,48 +49,29 @@ function display(msg) {
 
   chatBox.appendChild(msgDiv);
   chatBox.scrollTop = chatBox.scrollHeight;
-  input.value = "";
 }
 
 sendBtn.addEventListener("click", async () => {
   const msg = input.value.trim();
-  if (!msg) return;
+  if (!msg || msg.length === 0) return;
 
-  const storeMessage = await fetch("http://localhost:4000/user/send-message", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + token,
-    },
-    body: JSON.stringify({ message: msg }),
-  });
-
-  const data = await storeMessage.json();
-
-  if (storeMessage.status !== 201) {
-    const sentStatus = document.getElementById("sent-status");
-    sentStatus.textContent = data.message;
-    sentStatus.style.color = "red";
-  } else {
-    const msgDiv = document.createElement("div");
-    msgDiv.classList.add("message", "sent");
-    msgDiv.innerHTML = `<p>${msg}</p><span class="timestamp">${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>`;
-
-    chatBox.appendChild(msgDiv);
-    chatBox.scrollTop = chatBox.scrollHeight;
-    input.value = "";
-  }
+  // await fetch("http://localhost:4000/user/send-message", {
+  //   method: "POST",
+  //   headers: {
+  //     "Content-Type": "application/json",
+  //     Authorization: "Bearer " + token,
+  //   },
+  //   body: JSON.stringify({ message: msg }),
+  // });
+  socket.send(msg);
+  input.value = "";
 });
 
-const socket = new WebSocket("ws://localhost:4000");
-
 socket.onmessage = async (event) => {
-  const li = document.createElement("li");
-  li.innerText = await event.data.text();
-  chatBox.appendChild(li);
-};
+  const messageText = await event.data.text();
 
-function send() {
-  const text = document.getElementById("msg").value;
-  socket.send(text);
-}
+  display({
+    message: messageText,
+    createdAt: new Date(),
+  });
+};

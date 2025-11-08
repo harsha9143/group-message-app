@@ -1,9 +1,11 @@
 //core modules
+const http = require("http");
 const path = require("path");
 
 //third-party modules
 const express = require("express");
 const cors = require("cors");
+const WebSocket = require("ws");
 require("dotenv").config();
 
 //local modules
@@ -30,10 +32,34 @@ app.get("/verify-token", authenticate, (req, res) => {
   res.json({ user: req.user });
 });
 
-sequelize.sync().then(() => {
-  app.listen(process.env.PORT, () => {
-    console.log(
-      `connection eshtablished successfully http://localhost:4000/sign-up`
-    );
+const server = http.createServer(app);
+
+const wss = new WebSocket.Server({ server });
+
+let sockets = [];
+
+wss.on("connection", (ws) => {
+  sockets.push(ws);
+
+  ws.on("message", async (message) => {
+    await Message.create({
+      message: message,
+      userId: 1,
+    });
+    sockets.forEach((s) => s.send(message));
   });
+
+  ws.on("close", () => {
+    sockets = sockets.filter((s) => s !== ws);
+  });
+});
+
+sequelize.sync().then(() => {
+  // app.listen(process.env.PORT, () => {
+  //   console.log(
+  //     `connection eshtablished successfully http://localhost:4000/login`
+  //   );
+  // });
+
+  server.listen(4000, () => console.log("web socket server on port 4003"));
 });
