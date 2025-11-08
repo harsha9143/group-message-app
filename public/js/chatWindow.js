@@ -83,7 +83,7 @@ sendBtn.addEventListener("click", async () => {
   //   },
   //   body: JSON.stringify({ message: msg }),
   // });
-  socket.emit("message-room", msg);
+  socket.emit("new-message", msg);
   input.value = "";
 });
 
@@ -96,6 +96,14 @@ sendBtn.addEventListener("click", async () => {
 //   });
 // };
 
-socket.on("message-room", (message) => {
+socket.on("new-message", (message) => {
   display(message);
+});
+
+document.getElementById("search").addEventListener("keydown", (event) => {
+  if (event.key == "enter") {
+    const email = event.target.search.value;
+
+    socket.emit("join-room", email);
+  }
 });

@@ -37,5 +37,5 @@ const server = http.createServer(app);
 socket_io(server);
 
 sequelize.sync().then(() => {
-  server.listen(4000, () => console.log("web socket server on port 4004"));
+  server.listen(4000, () => console.log("web socket server on port 4000"));
 });

@@ -4,12 +4,15 @@ module.exports = (io, socket) => {
   });
 
   socket.on("new-message", ({ message, roomName }) => {
-    io.emit("message-room", { username: socket.user.username, message });
+    io.to(roomName).emit("new-message", {
+      username: socket.user.username,
+      message,
+    });
   });
 
-  socket.on("message-room", async (message) => {
+  socket.on("new-message", async (message) => {
     await Message.create({ message, userId: socket.user.id });
-    io.emit("message-room", {
+    io.emit("new-message", {
       message,
       username: socket.user.name,
       createdAt: new Date(),
