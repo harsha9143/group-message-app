@@ -1,6 +1,6 @@
 window.addEventListener("DOMContentLoaded", () => initialize());
 const token = localStorage.getItem("token");
-const socket = new WebSocket(`ws://localhost:4000`);
+const socket = io(`ws://localhost:4000`);
 
 const chatBox = document.getElementById("chat-box");
 const sendBtn = document.getElementById("sendBtn");
@@ -63,15 +63,19 @@ sendBtn.addEventListener("click", async () => {
   //   },
   //   body: JSON.stringify({ message: msg }),
   // });
-  socket.send(msg);
+  socket.emit("message-room", msg);
   input.value = "";
 });
 
-socket.onmessage = async (event) => {
-  const messageText = await event.data.text();
+// socket.onmessage = async (event) => {
+//   const messageText = await event.data.text();
 
-  display({
-    message: messageText,
-    createdAt: new Date(),
-  });
-};
+//   display({
+//     message: messageText,
+//     createdAt: new Date(),
+//   });
+// };
+
+socket.on("message-room", (message) => {
+  display({ message, createdAt: new Date().toLocaleTimeString() });
+});

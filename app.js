@@ -6,6 +6,7 @@ const path = require("path");
 const express = require("express");
 const cors = require("cors");
 const WebSocket = require("ws");
+const { Server } = require("socket.io");
 require("dotenv").config();
 
 //local modules
@@ -34,23 +35,16 @@ app.get("/verify-token", authenticate, (req, res) => {
 
 const server = http.createServer(app);
 
-const wss = new WebSocket.Server({ server });
+const io = new Server(server);
 
-let sockets = [];
+//const wss = new WebSocket.Server({ server });
 
-wss.on("connection", (ws) => {
-  sockets.push(ws);
+//let sockets = [];
 
-  ws.on("message", async (message) => {
-    await Message.create({
-      message: message,
-      userId: 1,
-    });
-    sockets.forEach((s) => s.send(message));
-  });
-
-  ws.on("close", () => {
-    sockets = sockets.filter((s) => s !== ws);
+io.on("connection", (socket) => {
+  socket.on("message-room", async (message) => {
+    await Message.create({ message, userId: 0 });
+    io.emit("message-room", message);
   });
 });
 
