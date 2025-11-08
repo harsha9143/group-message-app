@@ -26,6 +26,17 @@ async function initialize() {
   }
 
   document.getElementById("chat-container").style.display = "";
+  document.getElementById("chat-header").style.display = "";
+
+  const userDetails = await fetch(`http://localhost:4000/user/user-details`, {
+    headers: {
+      Authorization: "Bearer " + token,
+    },
+  });
+
+  const userData = await userDetails.json();
+
+  document.getElementById("username").innerText = userData.name;
 
   chatBox.innerHTML = "";
   const messages = await fetch(`http://localhost:4000/user/get-messages`, {
@@ -36,17 +47,20 @@ async function initialize() {
 
   const messageData = await messages.json();
 
-  const userMessages = messageData.messages;
-
-  for (let i = 0; i < userMessages.length; i++) {
-    display(userMessages[i], messageData.name);
+  for (let i = 0; i < messageData.length; i++) {
+    display(messageData[i], messageData[i].user.name, userData);
   }
 }
 
-function display(msg, name) {
+function display(msg, name, userData) {
   const msgDiv = document.createElement("div");
   //const username = msg.username || name;
-  msgDiv.classList.add("message", "sent");
+  if (userData.id === msg.userId) {
+    msgDiv.classList.add("message", "sent");
+  } else {
+    msgDiv.classList.add("message", "received");
+  }
+
   msgDiv.innerHTML = `<span class="name">${name || msg.username}</span><p>${msg.message}</p><span class="timestamp">${new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>`;
 
   chatBox.appendChild(msgDiv);
