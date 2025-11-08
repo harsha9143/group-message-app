@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const User = require("../models/user");
 
 exports.authenticate = (req, res, next) => {
   const authHeader = req.headers["authorization"];
@@ -8,12 +9,13 @@ exports.authenticate = (req, res, next) => {
     return res.status(401).json({ message: "Access denied. Token Missing" });
   }
 
-  jwt.verify(token, process.env.JWT_SECRET_KEY, (err, user) => {
+  jwt.verify(token, process.env.JWT_SECRET_KEY, async (err, user) => {
     if (err) {
       return res.status(403).json({ message: "Invalid token/session expired" });
     }
 
-    req.user = user;
+    const existingUser = await User.findByPk(user.id);
+    req.user = existingUser;
     next();
   });
 };

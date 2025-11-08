@@ -45,7 +45,7 @@ exports.getMessages = async (req, res) => {
       return res.status(404).json({ message: "Failed to fetch messages" });
     }
 
-    res.status(200).json(messages);
+    res.status(200).json({ messages, name: req.user.name });
   } catch (error) {
     console.log(error.message);
     res

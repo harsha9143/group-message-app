@@ -36,15 +36,18 @@ async function initialize() {
 
   const messageData = await messages.json();
 
-  for (let i = 0; i < messageData.length; i++) {
-    display(messageData[i]);
+  const userMessages = messageData.messages;
+
+  for (let i = 0; i < userMessages.length; i++) {
+    display(userMessages[i], messageData.name);
   }
 }
 
-function display(msg) {
+function display(msg, name) {
   const msgDiv = document.createElement("div");
+  //const username = msg.username || name;
   msgDiv.classList.add("message", "sent");
-  msgDiv.innerHTML = `<span class="name">${msg.username}</span><p>${msg.message}</p><span class="timestamp">${new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>`;
+  msgDiv.innerHTML = `<span class="name">${name || msg.username}</span><p>${msg.message}</p><span class="timestamp">${new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>`;
 
   chatBox.appendChild(msgDiv);
   chatBox.scrollTop = chatBox.scrollHeight;
