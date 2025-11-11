@@ -15,6 +15,7 @@ const userRouter = require("./routes/userRouter");
 const Message = require("./models/message");
 const { authenticate } = require("./middleware/authenticationToken");
 const socket_io = require("./socket_io/index");
+const cronJob = require("./services/cronService");
 
 User.hasMany(Message);
 Message.belongsTo(User);
