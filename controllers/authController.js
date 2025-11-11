@@ -14,6 +14,21 @@ exports.loginPage = (req, res) => {
 exports.signupUser = async (req, res) => {
   const { name, email, phone, password } = req.body;
   try {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: "Invalid email format" });
+    }
+
+    const userExist = await User.findOne({
+      where: {
+        email,
+      },
+    });
+
+    if (userExist) {
+      return res.status(403).json({ message: "user already exists" });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create({
@@ -89,7 +104,6 @@ exports.loginUser = async (req, res) => {
 
     res.status(200).json({ message: "Login successful", token });
   } catch (error) {
-    console.log("Failed to login>>>>>>", error.message);
     res.status(500).json({ message: "Server error!! failed to login" });
   }
 };

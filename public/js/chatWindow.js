@@ -4,6 +4,8 @@ const token = localStorage.getItem("token");
 const chatBox = document.getElementById("chat-box");
 const sendBtn = document.getElementById("sendBtn");
 const input = document.getElementById("messageInput");
+const fileInput = document.getElementById("fileInput");
+const sendFileBtn = document.getElementById("sendFileBtn");
 
 async function userDetails() {
   const userDetails = await fetch(`http://localhost:4000/user/user-details`, {
@@ -75,7 +77,18 @@ function display(msg, name, id) {
     msgDiv.classList.add("message", "received");
   }
 
-  msgDiv.innerHTML = `<span class="name">${name || msg.username}</span><p>${msg.message}</p><span class="timestamp">${new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>`;
+  if (msg.mediaUrl) {
+    const ext = msg.mediaUrl.split(".").pop().toLowerCase();
+    if (["jpg", "jpeg", "png", "gif"].includes(ext)) {
+      msgDiv.innerHTML = `<span class="name">${name}</span><img src="${msg.mediaUrl}" width="200"><span class="timestamp">${new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>`;
+    } else if (["mp4", "webm"].includes(ext)) {
+      msgDiv.innerHTML = `<span class="name">${name}</span><video controls width="250"><source src="${msg.mediaUrl}"></video>`;
+    } else {
+      msgDiv.innerHTML = `<span class="name">${name}</span><a href="${msg.mediaUrl}" target="_blank">Download file</a>`;
+    }
+  } else {
+    msgDiv.innerHTML = `<span class="name">${name || msg.username}</span><p>${msg.message}</p><span class="timestamp">${new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>`;
+  }
 
   chatBox.appendChild(msgDiv);
   chatBox.scrollTop = chatBox.scrollHeight;
@@ -104,6 +117,7 @@ document
     if (event.key === "Enter") {
       const myself = JSON.parse(localStorage.getItem("details")).email;
       const other = event.target.value;
+      event.target.value = "";
       const userExists = await fetch(`http://localhost:4000/user/user-exists`, {
         method: "POST",
         headers: {
@@ -133,6 +147,7 @@ document
   .addEventListener("keydown", async (event) => {
     if (event.key === "Enter") {
       const groupName = event.target.value;
+      event.target.value = "";
 
       window.roomName = groupName;
       socket.emit("join-room", window.roomName);
@@ -140,6 +155,40 @@ document
       getOldMessages(window.roomName);
     }
   });
+
+sendFileBtn.addEventListener("click", async () => {
+  console.log("Button clicked");
+  const file = fileInput.files[0];
+
+  console.log(file);
+
+  if (!file) {
+    alert("Please select a file first");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await fetch("http://localhost:4000/user/upload", {
+    method: "POST",
+    headers: {
+      Authorization: "Bearer " + token,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    return;
+  }
+
+  const data = await response.json();
+  const mediaUrl = data.url;
+
+  socket.emit("new-media", { mediaUrl, roomName: window.roomName });
+
+  fileInput.value = "";
+});
 
 document.getElementById("logoutBtn").addEventListener("click", () => {
   localStorage.removeItem("token");
