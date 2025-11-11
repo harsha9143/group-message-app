@@ -189,3 +189,23 @@ body {
 #logoutBtn:hover {
   background: #e63946;
 }
+
+.sidebar {
+  width: 250px;
+  background-color: #1e293b;
+  padding: 15px;
+  height: 100vh;
+}
+
+#searchbar {
+  width: 100%;
+  padding: 8px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+#searchbar:focus {
+  outline: none;
+  box-shadow: 0 0 5px #38bdf8;
+}

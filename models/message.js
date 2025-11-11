@@ -12,6 +12,10 @@ const Message = sequelize.define("messages", {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  roomName: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
 });
 
 module.exports = Message;

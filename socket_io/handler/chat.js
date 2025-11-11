@@ -1,3 +1,5 @@
+const Message = require("../../models/message");
+
 module.exports = (io, socket) => {
   socket.on("message-room", async (message) => {
     await Message.create({ message, userId: socket.user.id });

@@ -5,6 +5,18 @@ const chatBox = document.getElementById("chat-box");
 const sendBtn = document.getElementById("sendBtn");
 const input = document.getElementById("messageInput");
 
+async function userDetails() {
+  const userDetails = await fetch(`http://localhost:4000/user/user-details`, {
+    headers: {
+      Authorization: "Bearer " + token,
+    },
+  });
+
+  const userData = await userDetails.json();
+
+  return userData;
+}
+
 async function initialize() {
   if (!token) {
     alert("Login first");
@@ -28,34 +40,36 @@ async function initialize() {
   document.getElementById("chat-container").style.display = "";
   document.getElementById("chat-header").style.display = "";
 
-  const userDetails = await fetch(`http://localhost:4000/user/user-details`, {
-    headers: {
-      Authorization: "Bearer " + token,
-    },
-  });
+  const details = await userDetails();
 
-  const userData = await userDetails.json();
+  localStorage.setItem("details", JSON.stringify(details));
 
-  document.getElementById("username").innerText = userData.name;
+  document.getElementById("username").innerText = details.name;
+}
 
+async function getOldMessages(roomName) {
   chatBox.innerHTML = "";
-  const messages = await fetch(`http://localhost:4000/user/get-messages`, {
-    headers: {
-      Authorization: "Bearer " + token,
-    },
-  });
+  const messages = await fetch(
+    `http://localhost:4000/user/get-messages?roomName=${roomName}`,
+    {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    }
+  );
 
   const messageData = await messages.json();
 
+  const details = JSON.parse(localStorage.getItem("details"));
+
   for (let i = 0; i < messageData.length; i++) {
-    display(messageData[i], messageData[i].user.name, userData);
+    display(messageData[i], messageData[i].user.name, details.id);
   }
 }
 
-function display(msg, name, userData) {
+function display(msg, name, id) {
   const msgDiv = document.createElement("div");
-  //const username = msg.username || name;
-  if (userData.id === msg.userId) {
+  if (id === msg.userId) {
     msgDiv.classList.add("message", "sent");
   } else {
     msgDiv.classList.add("message", "received");
@@ -75,35 +89,49 @@ sendBtn.addEventListener("click", async () => {
   const msg = input.value.trim();
   if (!msg || msg.length === 0) return;
 
-  // await fetch("http://localhost:4000/user/send-message", {
-  //   method: "POST",
-  //   headers: {
-  //     "Content-Type": "application/json",
-  //     Authorization: "Bearer " + token,
-  //   },
-  //   body: JSON.stringify({ message: msg }),
-  // });
-  socket.emit("new-message", msg);
+  socket.emit("new-message", { message: msg, roomName: window.roomName });
   input.value = "";
 });
 
-// socket.onmessage = async (event) => {
-//   const messageText = await event.data.text();
-
-//   display({
-//     message: messageText,
-//     createdAt: new Date(),
-//   });
-// };
-
-socket.on("new-message", (message) => {
-  display(message);
+socket.on("new-message", async (message) => {
+  const details = JSON.parse(localStorage.getItem("details"));
+  display(message, message.username, details.id);
 });
 
-document.getElementById("search").addEventListener("keydown", (event) => {
-  if (event.key == "enter") {
-    const email = event.target.search.value;
+document
+  .getElementById("searchbar")
+  .addEventListener("keydown", async (event) => {
+    if (event.key === "Enter") {
+      const myself = JSON.parse(localStorage.getItem("details")).email;
+      const other = event.target.value;
+      const userExists = await fetch(`http://localhost:4000/user/user-exists`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+        body: JSON.stringify({ email: other }),
+      });
 
-    socket.emit("join-room", email);
-  }
+      const exists = await userExists.json();
+
+      if (exists.exists) {
+        window.roomName = [myself, other].sort().join("_");
+        socket.emit("join-room", window.roomName);
+        alert("joined the room" + window.roomName);
+        getOldMessages(window.roomName);
+      } else if (userExists.status === 500) {
+        alert("Internal server error");
+      } else {
+        alert("User with entered email doesnot exist");
+      }
+    }
+  });
+
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  localStorage.removeItem("token");
+
+  setTimeout(() => {
+    window.location.href = "http://localhost:4000/login";
+  }, 1000);
 });

@@ -35,10 +35,12 @@ exports.userAccount = (req, res) => {
 
 exports.getMessages = async (req, res) => {
   try {
+    const roomName = req.query.roomName;
+
     const messages = await Message.findAll({
-      // where: {
-      //   userId: req.user.id,
-      // },
+      where: {
+        roomName,
+      },
       order: [["createdAt", "ASC"]],
       include: [
         {
@@ -71,6 +73,27 @@ exports.getUserDetails = async (req, res) => {
 
     res.status(200).json(userDetails);
   } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+exports.userExists = async (req, res) => {
+  try {
+    const otherUser = req.body.email;
+
+    const userExist = await User.findOne({
+      where: {
+        email: otherUser,
+      },
+    });
+
+    if (!userExist) {
+      return res.status(200).json({ exists: false });
+    }
+
+    res.status(200).json({ exists: true });
+  } catch (error) {
+    console.log("error>>>>>>>>", error.message);
     res.status(500).json({ message: "Internal server error" });
   }
 };

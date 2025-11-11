@@ -37,5 +37,9 @@ const server = http.createServer(app);
 socket_io(server);
 
 sequelize.sync().then(() => {
-  server.listen(4000, () => console.log("web socket server on port 4000"));
+  server.listen(4000, () =>
+    console.log(
+      "connection eshtablished successfully http://localhost:4000/login"
+    )
+  );
 });

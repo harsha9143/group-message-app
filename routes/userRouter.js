@@ -8,5 +8,6 @@ userRouter.get("/", userController.userAccount);
 //userRouter.post("/send-message", authenticate, userController.storeMessage);
 userRouter.get("/get-messages", authenticate, userController.getMessages);
 userRouter.get("/user-details", authenticate, userController.getUserDetails);
+userRouter.post("/user-exists", authenticate, userController.userExists);
 
 module.exports = userRouter;
