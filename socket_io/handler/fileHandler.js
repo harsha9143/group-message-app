@@ -1,3 +1,5 @@
+const Message = require("../../models/message");
+
 module.exports = (io, socket) => {
   socket.on("new-media", async ({ mediaUrl, roomName }) => {
     await Message.create({

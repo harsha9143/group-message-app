@@ -90,10 +90,10 @@ exports.uploadToS3 = async (req, res) => {
       Key: fileName,
       Body: req.file.buffer,
       ContentType: req.file.mimetype,
-      //ACL: "public-read",
+      ACL: "public-read",
     };
     const response = await s3bucket.upload(params).promise();
-    return response.Location;
+    res.status(200).json({ ok: true, fileUrl: response.Location });
   } catch (error) {
     console.log(error.message);
     return null;

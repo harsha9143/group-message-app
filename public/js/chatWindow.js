@@ -86,6 +86,15 @@ function display(msg, name, id) {
     } else {
       msgDiv.innerHTML = `<span class="name">${name}</span><a href="${msg.mediaUrl}" target="_blank">Download file</a>`;
     }
+  } else if (msg.message.startsWith("https://groupchatapp123.s3")) {
+    const ext = msg.message.split(".").pop().toLowerCase();
+    if (["jpg", "jpeg", "png", "gif"].includes(ext)) {
+      msgDiv.innerHTML = `<span class="name">${name}</span><img src="${msg.mediaUrl}" width="200"><span class="timestamp">${new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>`;
+    } else if (["mp4", "webm"].includes(ext)) {
+      msgDiv.innerHTML = `<span class="name">${name}</span><video controls width="250"><source src="${msg.mediaUrl}"></video>`;
+    } else {
+      msgDiv.innerHTML = `<span class="name">${name}</span><a href="${msg.mediaUrl}" target="_blank">Download file</a>`;
+    }
   } else {
     msgDiv.innerHTML = `<span class="name">${name || msg.username}</span><p>${msg.message}</p><span class="timestamp">${new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>`;
   }
@@ -178,12 +187,12 @@ sendFileBtn.addEventListener("click", async () => {
     body: formData,
   });
 
-  if (!response.ok) {
+  const data = await response.json();
+
+  if (!data.ok) {
     return;
   }
-
-  const data = await response.json();
-  const mediaUrl = data.url;
+  const mediaUrl = data.fileUrl;
 
   socket.emit("new-media", { mediaUrl, roomName: window.roomName });
 
