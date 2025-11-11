@@ -128,6 +128,19 @@ document
     }
   });
 
+document
+  .getElementById("searchGroup")
+  .addEventListener("keydown", async (event) => {
+    if (event.key === "Enter") {
+      const groupName = event.target.value;
+
+      window.roomName = groupName;
+      socket.emit("join-room", window.roomName);
+      alert("joined the group: " + window.roomName);
+      getOldMessages(window.roomName);
+    }
+  });
+
 document.getElementById("logoutBtn").addEventListener("click", () => {
   localStorage.removeItem("token");
 

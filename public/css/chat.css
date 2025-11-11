@@ -197,7 +197,8 @@ body {
   height: 100vh;
 }
 
-#searchbar {
+#searchbar,
+#searchGroup {
   width: 100%;
   padding: 8px;
   border: none;
@@ -206,6 +207,11 @@ body {
 }
 
 #searchbar:focus {
+  outline: none;
+  box-shadow: 0 0 5px #38bdf8;
+}
+
+#searchGroup:focus {
   outline: none;
   box-shadow: 0 0 5px #38bdf8;
 }
