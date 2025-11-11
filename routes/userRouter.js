@@ -16,5 +16,7 @@ userRouter.post(
   uploadMiddleware,
   userController.uploadToS3
 );
+userRouter.post("/suggestions", authenticate, userController.getSuggestions);
+userRouter.post("/smart-reply", authenticate, userController.getSmartReply);
 
 module.exports = userRouter;

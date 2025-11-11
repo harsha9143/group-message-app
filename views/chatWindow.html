@@ -37,17 +37,21 @@
         </div>
 
         <div class="chat-box" id="chat-box"></div>
+        <div id="suggestions" class="suggestions"></div>
 
         <div class="chat-input">
+          <label for="fileInput" class="file-label">📎</label>
+          <input type="file" id="fileInput" />
           <input
             type="text"
             id="messageInput"
             placeholder="Type a message..."
+            autocomplete="off"
           />
-          <input type="file" id="fileInput" style="margin-left: 8px" />
-          <button id="sendBtn">Send</button>
-          <button id="sendFileBtn">📎</button>
+          <button id="sendBtn" class="send-btn">➤</button>
         </div>
+
+        <div id="smartReplies" class="smart-replies"></div>
         <p id="sent-status"></p>
       </div>
     </div>

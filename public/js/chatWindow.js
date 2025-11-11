@@ -6,6 +6,9 @@ const sendBtn = document.getElementById("sendBtn");
 const input = document.getElementById("messageInput");
 const fileInput = document.getElementById("fileInput");
 const sendFileBtn = document.getElementById("sendFileBtn");
+const suggestionsBox = document.getElementById("suggestions");
+const smartRepliesBox = document.getElementById("smartReplies");
+const tone = "casual";
 
 async function userDetails() {
   const userDetails = await fetch(`http://localhost:4000/user/user-details`, {
@@ -108,16 +111,67 @@ const socket = io(`ws://localhost:4000`, {
 });
 
 sendBtn.addEventListener("click", async () => {
+  const file = fileInput.files[0];
+
+  if (file) {
+    await sendingFile(file);
+    return;
+  }
+
   const msg = input.value.trim();
   if (!msg || msg.length === 0) return;
 
   socket.emit("new-message", { message: msg, roomName: window.roomName });
   input.value = "";
+
+  const res = await fetch("http://localhost:4000/user/suggestions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token,
+    },
+    body: JSON.stringify({ text: msg, tone: "casual" }),
+  });
+
+  const data = await res.json();
+
+  suggestionsBox.innerHTML = data.suggestions
+    .map((s) => `<span class="suggestion">${s}</span>`)
+    .join("");
+
+  document.querySelectorAll(".suggestion").forEach((el) =>
+    el.addEventListener("click", () => {
+      input.value += " " + el.innerText;
+      suggestionsBox.innerHTML = "";
+      input.focus();
+    })
+  );
 });
 
 socket.on("new-message", async (message) => {
   const details = JSON.parse(localStorage.getItem("details"));
   display(message, message.username, details.id);
+
+  const res = await fetch("http://localhost:4000/user/smart-reply", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token,
+    },
+    body: JSON.stringify({ message: message.message, tone: "friendly" }),
+  });
+
+  const data = await res.json();
+  smartRepliesBox.innerHTML = data.replies
+    .map((r) => `<button class="reply-btn">${r}</button>`)
+    .join("");
+
+  document.querySelectorAll(".reply-btn").forEach((btn) =>
+    btn.addEventListener("click", () => {
+      input.value = btn.innerText;
+      smartRepliesBox.innerHTML = "";
+    })
+  );
 });
 
 document
@@ -165,17 +219,7 @@ document
     }
   });
 
-sendFileBtn.addEventListener("click", async () => {
-  console.log("Button clicked");
-  const file = fileInput.files[0];
-
-  console.log(file);
-
-  if (!file) {
-    alert("Please select a file first");
-    return;
-  }
-
+async function sendingFile(file) {
   const formData = new FormData();
   formData.append("file", file);
 
@@ -197,7 +241,7 @@ sendFileBtn.addEventListener("click", async () => {
   socket.emit("new-media", { mediaUrl, roomName: window.roomName });
 
   fileInput.value = "";
-});
+}
 
 document.getElementById("logoutBtn").addEventListener("click", () => {
   localStorage.removeItem("token");

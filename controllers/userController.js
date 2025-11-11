@@ -2,6 +2,7 @@ const path = require("path");
 const AWS = require("aws-sdk");
 const Message = require("../models/message");
 const User = require("../models/user");
+const { predictNextWord, smartReplies } = require("../services/genAiServices");
 
 exports.userAccount = (req, res) => {
   res.sendFile(path.join(__dirname, "../views", "chatWindow.html"));
@@ -97,5 +98,36 @@ exports.uploadToS3 = async (req, res) => {
   } catch (error) {
     console.log(error.message);
     return null;
+  }
+};
+
+exports.getSuggestions = async (req, res) => {
+  try {
+    const { text, tone } = req.body;
+
+    const suggestions = await predictNextWord(text, tone);
+
+    if (!suggestions) {
+      return;
+    }
+
+    res.status(200).json({ suggestions });
+  } catch (error) {
+    return;
+  }
+};
+
+exports.getSmartReply = async (req, res) => {
+  try {
+    const { message, tone } = req.body;
+    const smartReply = await smartReplies(message, tone);
+
+    if (!smartReply) {
+      return;
+    }
+
+    res.status(200).json({ replies: smartReply });
+  } catch (error) {
+    return;
   }
 };
