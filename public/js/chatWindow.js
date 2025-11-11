@@ -80,20 +80,20 @@ function display(msg, name, id) {
   if (msg.mediaUrl) {
     const ext = msg.mediaUrl.split(".").pop().toLowerCase();
     if (["jpg", "jpeg", "png", "gif"].includes(ext)) {
-      msgDiv.innerHTML = `<span class="name">${name}</span><img src="${msg.mediaUrl}" width="200"><span class="timestamp">${new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>`;
+      msgDiv.innerHTML = `<span class="name">${name}</span><a href="${msg.mediaUrl}" target="_blank"><img src="${msg.mediaUrl}" width="200"></a><span class="timestamp">${new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>`;
     } else if (["mp4", "webm"].includes(ext)) {
-      msgDiv.innerHTML = `<span class="name">${name}</span><video controls width="250"><source src="${msg.mediaUrl}"></video>`;
+      msgDiv.innerHTML = `<span class="name">${name}</span><a href="${msg.message}" target="_blank"><video controls width="250"><source src="${msg.mediaUrl}"></video></a>`;
     } else {
       msgDiv.innerHTML = `<span class="name">${name}</span><a href="${msg.mediaUrl}" target="_blank">Download file</a>`;
     }
   } else if (msg.message.startsWith("https://groupchatapp123.s3")) {
     const ext = msg.message.split(".").pop().toLowerCase();
     if (["jpg", "jpeg", "png", "gif"].includes(ext)) {
-      msgDiv.innerHTML = `<span class="name">${name}</span><img src="${msg.mediaUrl}" width="200"><span class="timestamp">${new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>`;
+      msgDiv.innerHTML = `<span class="name">${name}</span><a href="${msg.message}" target="_blank"><img src="${msg.message}" width="200"></a><span class="timestamp">${new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>`;
     } else if (["mp4", "webm"].includes(ext)) {
-      msgDiv.innerHTML = `<span class="name">${name}</span><video controls width="250"><source src="${msg.mediaUrl}"></video>`;
+      msgDiv.innerHTML = `<span class="name">${name}</span><a href="${msg.message}" target="_blank"><video controls width="250"><source src="${msg.message}"></video></a>`;
     } else {
-      msgDiv.innerHTML = `<span class="name">${name}</span><a href="${msg.mediaUrl}" target="_blank">Download file</a>`;
+      msgDiv.innerHTML = `<span class="name">${name}</span><a href="${msg.message}" target="_blank">Download file</a>`;
     }
   } else {
     msgDiv.innerHTML = `<span class="name">${name || msg.username}</span><p>${msg.message}</p><span class="timestamp">${new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>`;
