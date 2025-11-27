@@ -3,60 +3,102 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Group Chat</title>
-    <link rel="stylesheet" href="/css/chat.css" />
+    <title>ChatHub — Chat</title>
+    <link rel="stylesheet" href="/css/chatWindow.css" />
+    <script src="/socket.io/socket.io.js"></script>
   </head>
   <body>
-    <header id="chat-header" style="display: none">
-      <div class="user-info">
-        <span id="username"></span>
+    <nav style="display: none" id="navbar">
+      <a class="nav-logo" href="/">💬 ChatHub</a>
+      <div class="nav-user">
+        <div class="username" id="username"></div>
+        <button class="btn-logout" id="logout">Log out</button>
       </div>
-      <button id="logoutBtn">Logout</button>
-    </header>
+    </nav>
 
-    <div class="chat-container" id="chat-container" style="display: none">
-      <div class="sidebar">
-        <input
-          type="text"
-          id="searchbar"
-          name="searchbar"
-          placeholder="Search..."
-        />
-        <br /><br />
-        <input
-          type="text"
-          id="searchGroup"
-          name="searchGroup"
-          placeholder="Search Group..."
-        />
-      </div>
-
-      <div class="chat-section">
-        <div class="chat-header">
-          <h3>Global Room</h3>
+    <div class="app" id="app" style="display: none">
+      <aside class="sidebar" aria-label="Conversations">
+        <button id="create-group">Create Group</button>
+        <div class="search">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden
+          >
+            <path
+              d="M21 21l-4.35-4.35"
+              stroke="#9aa4d1"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <circle cx="11" cy="11" r="6" stroke="#9aa4d1" stroke-width="2" />
+          </svg>
+          <input
+            id="userSearch"
+            placeholder="Search people"
+            aria-label="Search people"
+          />
         </div>
 
-        <div class="chat-box" id="chat-box"></div>
-        <div id="suggestions" class="suggestions"></div>
+        <div id="userList" class="user-list"></div>
+      </aside>
 
-        <div class="chat-input">
-          <label for="fileInput" class="file-label">📎</label>
-          <input type="file" id="fileInput" />
+      <div class="chat-window" role="application" aria-label="Chat window">
+        <div class="chat-header">
+          <div id="chat-details">
+            <div class="avatar" id="chat-header-avatar"></div>
+            <div class="chat-meta">
+              <div class="name" id="group-members"></div>
+              <div class="status"></div>
+            </div>
+          </div>
+          <div id="chat-buttons"></div>
+        </div>
+        <div id="group-members-container" style="display: none">
           <input
             type="text"
-            id="messageInput"
-            placeholder="Type a message..."
-            autocomplete="off"
+            id="search-group-member"
+            style="width: 100%; margin: 10px 0px"
+            class="search"
           />
-          <button id="sendBtn" class="send-btn">➤</button>
+          <div id="group-members-list" class="user-list"></div>
         </div>
 
-        <div id="smartReplies" class="smart-replies"></div>
-        <p id="sent-status"></p>
+        <div id="messages" class="messages" aria-live="polite"></div>
+
+        <div id="suggestions"></div>
+        <form id="composer" class="composer" onsubmit="return false">
+          <div class="input">
+            <textarea
+              id="messageInput"
+              rows="1"
+              placeholder="Type a message"
+              aria-label="Type a message"
+            ></textarea>
+          </div>
+          <label for="fileUpload" class="btn-file" aria-label="Attach file">
+            📎
+          </label>
+          <input
+            id="fileUpload"
+            type="file"
+            multiple
+            accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx"
+            style="display: none"
+            aria-label="Select files to upload"
+          />
+          <button id="sendBtn" class="btn-send" aria-label="Send message">
+            Send
+          </button>
+        </form>
+        <div id="smart-replies"></div>
+        <p id="message-error"></p>
       </div>
     </div>
 
-    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
     <script src="/js/chatWindow.js"></script>
   </body>
 </html>

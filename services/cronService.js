@@ -1,10 +1,10 @@
 const { CronJob } = require("cron");
 const Message = require("../models/message");
 const { Op } = require("sequelize");
-const Archieved = require("../models/archieved");
+const ArchivedMessage = require("../models/ArchivedMessages");
 
 const cronJob = new CronJob(
-  "0 2 * * * *",
+  "0 2 * * * *", // cronTime
   async () => {
     try {
       const cutoffDate = new Date(Date.now() - 24 * 60 * 60 * 1000);
@@ -13,28 +13,31 @@ const cronJob = new CronJob(
           createdAt: { [Op.lt]: cutoffDate },
         },
       });
-
-      if (oldMessages.length === 0) {
+      if (!oldMessages || oldMessages.length === 0) {
         return;
       }
 
-      const archivedData = oldMessages.map((msg) => ({
+      const archievedData = oldMessages.map((msg) => ({
         message: msg.message,
         roomName: msg.roomName,
-        userId: msg.userId,
+        userId: msg.userId || null,
         createdAt: msg.createdAt,
       }));
 
-      await Archieved.bulkCreate(archivedData);
+      await ArchivedMessage.bulkCreate(archievedData);
 
-      await Chat.destroy({ where: { createdAt: { [Op.lt]: cutoffDate } } });
+      await Message.destroy({
+        where: {
+          createdAt: { [Op.lt]: cutoffDate },
+        },
+      });
     } catch (error) {
       return;
     }
-  },
-  null,
-  true,
-  "America/Los_Angeles" // timeZone
+  }, // onTick
+  null, // onComplete
+  true, // start
+  "Asia/Kolkata" // timeZone
 );
 
 module.exports = cronJob;

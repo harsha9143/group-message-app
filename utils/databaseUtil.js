@@ -6,7 +6,7 @@ const sequelize = new Sequelize(
   process.env.DB_PASS,
   {
     host: process.env.DB_HOST,
-    dialect: "mysql",
+    dialect: process.env.DB_DIALECT,
   }
 );
 
@@ -16,7 +16,7 @@ const sequelize = new Sequelize(
 
     console.log("Database connected successfully");
   } catch (error) {
-    console.log("Database connection failed>>>>>>>>>>>>>>", error.message);
+    console.log("Database connection failed>>>>>", error.message);
   }
 })();
 

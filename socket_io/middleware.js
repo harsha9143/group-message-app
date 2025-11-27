@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 
-module.exports = (io) => {
+const socketAuth = (io) => {
   io.use(async (socket, next) => {
     try {
       const token = socket.handshake.auth.token;
@@ -11,15 +11,12 @@ module.exports = (io) => {
       }
 
       const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+
       if (!decoded) {
-        return next(new Error("Token expired"));
+        return next(new Error("Invalid token!! please login"));
       }
 
       const user = await User.findByPk(decoded.id);
-
-      if (!user) {
-        return next(new Error("User not found"));
-      }
 
       socket.user = user;
       next();
@@ -28,3 +25,5 @@ module.exports = (io) => {
     }
   });
 };
+
+module.exports = socketAuth;

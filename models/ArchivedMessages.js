@@ -1,12 +1,13 @@
 const { DataTypes } = require("sequelize");
-const sequelize = require("../utils/dbUtil");
 
-const Archieved = sequelize.define("archives", {
+const sequelize = require("../utils/databaseUtil");
+
+const ArchivedMessage = sequelize.define("messages", {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
-    autoIncrement: true,
     allowNull: false,
+    autoIncrement: true,
   },
   message: {
     type: DataTypes.STRING,
@@ -18,8 +19,7 @@ const Archieved = sequelize.define("archives", {
   },
   userId: {
     type: DataTypes.INTEGER,
-    allowNull: false,
   },
 });
 
-module.exports = Archieved;
+module.exports = ArchivedMessage;

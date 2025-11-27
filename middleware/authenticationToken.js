@@ -1,21 +1,24 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/user");
+exports.authenticate = async (req, res, next) => {
+  try {
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
 
-exports.authenticate = (req, res, next) => {
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
-
-  if (!token) {
-    return res.status(401).json({ message: "Access denied. Token Missing" });
-  }
-
-  jwt.verify(token, process.env.JWT_SECRET_KEY, async (err, user) => {
-    if (err) {
-      return res.status(403).json({ message: "Invalid token/session expired" });
+    if (!token) {
+      return res.status(401).json({ message: "Access denied...Token missing" });
     }
 
-    const existingUser = await User.findByPk(user.id);
-    req.user = existingUser;
-    next();
-  });
+    jwt.verify(token, process.env.JWT_SECRET_KEY, async (error, user) => {
+      if (error) {
+        return res
+          .status(403)
+          .json({ message: "Invalid token/session expired" });
+      }
+
+      req.user = user;
+      next();
+    });
+  } catch (error) {
+    return;
+  }
 };

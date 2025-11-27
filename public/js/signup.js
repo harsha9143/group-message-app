@@ -1,3 +1,7 @@
+const url = "http://localhost:4000";
+
+const comment = document.getElementById("comment");
+
 async function handleOnSubmit(e) {
   e.preventDefault();
 
@@ -5,26 +9,26 @@ async function handleOnSubmit(e) {
   const email = e.target.email.value;
   const phone = e.target.phone.value;
   const password = e.target.password.value;
+  const confirmPassword = e.target.confirmPassword.value;
 
-  const createUser = await fetch("http://localhost:4000/sign-up", {
+  const createUser = await fetch(`${url}/sign-up`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ name, email, phone, password }),
+    body: JSON.stringify({ name, email, phone, password, confirmPassword }),
   });
 
   const data = await createUser.json();
 
-  const msg = document.getElementById("message");
-  msg.textContent = data.message;
+  comment.innerText = data.message;
 
   if (createUser.status === 201) {
-    msg.style.color = "green";
+    comment.style.color = "green";
     setTimeout(() => {
-      window.location.href = "http://localhost:4000/login";
-    }, 1500);
+      window.location.href = `${url}/login`;
+    }, 1000);
   } else {
-    msg.style.color = "red";
+    comment.style.color = "red";
   }
 }

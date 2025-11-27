@@ -1,29 +1,32 @@
+const url = "http://localhost:4000";
+
+const comment = document.getElementById("comment");
+
 async function handleOnSubmit(e) {
   e.preventDefault();
 
-  const emailPhone = e.target.emailPhone.value;
+  const email_phone = e.target.email_phone.value;
   const password = e.target.password.value;
 
-  const loginUser = await fetch("http://localhost:4000/login", {
+  const loginUser = await fetch(`${url}/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ emailPhone, password }),
+    body: JSON.stringify({ email_phone, password }),
   });
 
   const data = await loginUser.json();
 
-  const msg = document.getElementById("message");
-  msg.textContent = data.message;
+  localStorage.setItem("token", data.token);
+  comment.innerText = data.message;
 
   if (loginUser.status === 200) {
-    localStorage.setItem("token", data.token);
-    msg.style.color = "green";
+    comment.style.color = "green";
     setTimeout(() => {
-      window.location.href = "http://localhost:4000/user";
-    }, 1500);
+      window.location.href = `${url}/user`;
+    }, 1000);
   } else {
-    msg.style.color = "red";
+    comment.style.color = "red";
   }
 }

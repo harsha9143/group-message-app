@@ -1,46 +1,47 @@
 //core modules
-const http = require("http");
 const path = require("path");
+const http = require("http");
 
-//third-party modules
+//third party modules
 const express = require("express");
-const cors = require("cors");
 require("dotenv").config();
 
 //local modules
+const sequelize = require("./utils/databaseUtil");
 const authRouter = require("./routes/authRouter");
-const sequelize = require("./utils/dbUtil");
-const User = require("./models/user");
 const userRouter = require("./routes/userRouter");
-const Message = require("./models/message");
 const { authenticate } = require("./middleware/authenticationToken");
-const socket_io = require("./socket_io/index");
+const Message = require("./models/message");
+const User = require("./models/user");
+const socketIO = require("./socket_io");
 const cronJob = require("./services/cronService");
-
-User.hasMany(Message);
-Message.belongsTo(User);
 
 const app = express();
 
-app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 
+User.hasMany(Message);
+Message.belongsTo(User);
+
 app.use("/", authRouter);
 app.use("/user", userRouter);
+
 app.get("/verify-token", authenticate, (req, res) => {
-  res.json({ user: req.user });
+  res.status(200).json({ user: req.user });
+});
+
+app.use("/", (req, res) => {
+  res.status(404).sendFile(path.join(__dirname, "./views", "error.html"));
 });
 
 const server = http.createServer(app);
 
-socket_io(server);
+socketIO(server);
 
 sequelize.sync().then(() => {
-  server.listen(4000, () =>
-    console.log(
-      "connection eshtablished successfully http://localhost:4000/login"
-    )
-  );
+  server.listen(process.env.PORT, () => {
+    console.log(`connection eshtablished successfully ${process.env.URL}`);
+  });
 });

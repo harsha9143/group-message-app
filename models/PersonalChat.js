@@ -1,22 +1,22 @@
 const { DataTypes } = require("sequelize");
-
 const sequelize = require("../utils/databaseUtil");
 
-const Message = sequelize.define("messages", {
+const PersonalChat = sequelize.define("personal_chats", {
   id: {
     type: DataTypes.INTEGER,
-    primaryKey: true,
     allowNull: false,
+    primaryKey: true,
     autoIncrement: true,
   },
-  message: {
+  members: {
     type: DataTypes.STRING,
     allowNull: false,
   },
   roomName: {
     type: DataTypes.STRING,
     allowNull: false,
+    unique: true,
   },
 });
 
-module.exports = Message;
+module.exports = PersonalChat;

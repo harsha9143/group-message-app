@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Group — ChatHub</title>
+    <link rel="stylesheet" href="/css/create-group.css" />
+  </head>
+  <body>
+    <main class="card" role="main" id="main" style="display: none">
+      <h1>Create a Group</h1>
+      <p class="lead">
+        Give your group a name and optional description. Invite members after
+        creation.
+      </p>
+
+      <form onsubmit="handleOnSubmit(event)" id="createGroupForm">
+        <div class="form-row column">
+          <div>
+            <label for="groupName">Group Name</label>
+            <input
+              type="text"
+              id="groupName"
+              name="groupName"
+              placeholder="E.g. Weekend Friends"
+              required
+            />
+          </div>
+
+          <!-- <div>
+            <label for="groupDesc">Description (optional)</label>
+            <textarea
+              id="groupDesc"
+              name="groupDesc"
+              placeholder="A short description about the group's purpose"
+            ></textarea>
+          </div> -->
+        </div>
+
+        <!-- <div class="form-row">
+          <div style="flex: 0 0 84px">
+            <label>Group Avatar</label>
+            <div class="avatar-preview" id="avatarPreview">G</div>
+          </div>
+          <div style="flex: 1">
+            <label for="groupAvatar" class="file-input"
+              >Upload avatar (optional)</label
+            >
+            <input type="file" id="groupAvatar" accept="image/*" />
+            <div class="helper">
+              PNG or JPG — recommended 300x300px. Max 2MB.
+            </div>
+          </div>
+        </div> -->
+
+        <div class="actions">
+          <a href="/" class="btn btn-secondary">Cancel</a>
+          <button type="submit" class="btn btn-primary">Create Group</button>
+        </div>
+      </form>
+    </main>
+
+    <p id="comment"></p>
+
+    <script src="/js/createGroup.js"></script>
+  </body>
+</html>

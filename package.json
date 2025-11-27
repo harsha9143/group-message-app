@@ -1,5 +1,5 @@
 {
-  "name": "group-message-app",
+  "name": "group-chat-app",
   "version": "1.0.0",
   "description": "",
   "license": "ISC",
@@ -11,7 +11,7 @@
     "start": "nodemon app.js"
   },
   "dependencies": {
-    "@google/genai": "^1.29.0",
+    "@google/genai": "^1.30.0",
     "aws-sdk": "^2.1692.0",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
@@ -21,9 +21,13 @@
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.2",
     "mysql2": "^3.15.3",
-    "nodemon": "^3.1.10",
     "sequelize": "^6.37.7",
     "socket.io": "^4.8.1",
+    "uuid": "^13.0.0",
+    "validator": "^13.15.23",
     "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
   }
 }

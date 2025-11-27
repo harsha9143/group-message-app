@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Group Chat - Sign Up</title>
+    <link rel="stylesheet" href="/css/sign-up.css" />
+  </head>
+  <body>
+    <nav>
+      <div class="nav-container">
+        <a href="http://localhost:4000" class="nav-logo"> 💬 ChatHub </a>
+        <ul class="nav-links">
+          <li><a href="http://localhost:4000">Home</a></li>
+          <li>
+            <a href="http://localhost:4000/login" class="btn-login">Login</a>
+          </li>
+          <li>
+            <a href="http://localhost:4000/sign-up" class="btn-signup"
+              >Sign Up</a
+            >
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="container">
+      <form onsubmit="handleOnSubmit(event)">
+        <h2>Create Your Account</h2>
+
+        <div class="form-group">
+          <label for="name">Name:</label>
+          <input
+            type="text"
+            name="name"
+            id="name"
+            placeholder="Enter your full name"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input
+            type="email"
+            name="email"
+            id="email"
+            placeholder="Enter your email"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Phone:</label>
+          <input
+            type="tel"
+            name="phone"
+            id="phone"
+            placeholder="Enter your phone number"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password:</label>
+          <input
+            type="password"
+            name="password"
+            id="password"
+            placeholder="Create a password"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password:</label>
+          <input
+            type="password"
+            name="confirmPassword"
+            id="confirmPassword"
+            placeholder="Confirm your password"
+          />
+        </div>
+
+        <button type="submit">Sign Up</button>
+
+        <div class="form-footer">
+          Already have an account?
+          <a href="http://localhost:4000/login">Log in here</a>
+        </div>
+      </form>
+      <p id="comment"></p>
+    </div>
+
+    <script src="/js/signup.js"></script>
+  </body>
+</html>

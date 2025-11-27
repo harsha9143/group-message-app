@@ -1,109 +1,142 @@
+//core modules
 const path = require("path");
+
+//third-party modules
+const validator = require("validator");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+
+//local modules
 const User = require("../models/user");
 
+exports.homePage = (req, res) => {
+  res.sendFile(path.join(__dirname, "../views", "home.html"));
+};
+
 exports.signupPage = (req, res) => {
-  res.sendFile(path.join(__dirname, "../views", "signup.html"));
+  res.sendFile(path.join(__dirname, "../views", "sign-up.html"));
 };
 
 exports.loginPage = (req, res) => {
   res.sendFile(path.join(__dirname, "../views", "login.html"));
 };
 
-exports.signupUser = async (req, res) => {
-  const { name, email, phone, password } = req.body;
+exports.addUser = async (req, res) => {
   try {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({ message: "Invalid email format" });
+    const { name, email, phone, password, confirmPassword } = req.body;
+
+    if (
+      name.length === 0 ||
+      email.length === 0 ||
+      phone.length === 0 ||
+      password.length === 0 ||
+      confirmPassword.length === 0
+    ) {
+      return res.status(400).json({ message: "All fields are required" });
     }
 
-    const userExist = await User.findOne({
+    if (!validator.isEmail(email)) {
+      return res.status(400).json({ message: "Please enter valid email id" });
+    }
+
+    if (!validator.isMobilePhone(phone, "any")) {
+      return res
+        .status(400)
+        .json({ message: "Please enter valid Phone Number" });
+    }
+
+    const userExist1 = await User.findOne({
       where: {
         email,
       },
     });
 
-    if (userExist) {
-      return res.status(403).json({ message: "user already exists" });
+    const userExist2 = await User.findOne({
+      where: {
+        phone,
+      },
+    });
+
+    if (userExist1 || userExist2) {
+      return res.status(400).json({ message: "Email/Phone already exists" });
+    }
+
+    if (password !== confirmPassword) {
+      return res.status(400).json({ message: "Password does not match" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await User.create({
+    const createUser = await User.create({
       name,
       email,
       phone,
       password: hashedPassword,
+      friends: JSON.stringify([]),
+      groups: JSON.stringify([]),
     });
 
-    if (!user) {
-      return res.status(403).json({ message: "Failed to create user" });
+    if (!createUser) {
+      return res
+        .status(400)
+        .json({ message: "User cannot be created at the moment" });
     }
 
-    res.status(201).json({ message: "User account created successfully" });
+    res.status(201).json({ message: "User created successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Server Error!! user creation failed" });
+    res.status(500).json({ message: error.message });
   }
 };
 
 exports.loginUser = async (req, res) => {
-  const { emailPhone, password } = req.body;
   try {
-    if (!emailPhone) {
-      return res
-        .status(400)
-        .json({ message: "Email or Phone cannot be empty" });
-    }
-
-    if (!password) {
-      return res.status(400).json({ message: "Please enter your password" });
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const phoneRegex = /^[6-9]\d{9}$/;
+    const { email_phone, password } = req.body;
 
     let user;
 
-    if (emailRegex.test(emailPhone)) {
+    if (validator.isEmail(email_phone)) {
       user = await User.findOne({
         where: {
-          email: emailPhone,
+          email: email_phone,
         },
       });
-    } else if (phoneRegex.test(emailPhone)) {
+    } else if (validator.isMobilePhone(email_phone, "any")) {
       user = await User.findOne({
         where: {
-          phone: emailPhone,
+          phone: email_phone,
         },
       });
     } else {
       return res
-        .status(404)
-        .json({ message: "Please enter valid email or phone" });
+        .status(403)
+        .json({ message: "Entered email/phone is not valid" });
+    }
+
+    if (password.length === 0) {
+      return res.status(400).json({ message: "Password cannot be empty!!!" });
     }
 
     if (!user) {
-      return res.status(404).json({ message: "Email/Phone does not exist" });
+      return res.status(400).json({ message: "User not found!!!" });
     }
 
-    const passwordMatch = await bcrypt.compare(password, user.password);
+    const match = await bcrypt.compare(password, user.password);
 
-    if (!passwordMatch) {
-      return res.status(403).json({ message: "Incorrect Password" });
+    if (!match) {
+      return res.status(403).json({ message: "incorrect password" });
     }
 
     const token = jwt.sign(
       { id: user.id, name: user.name },
-      process.env.JWT_SECRET_KEY,
-      {
-        expiresIn: process.env.JWT_EXPIRES_IN,
-      }
+      process.env.JWT_SECRET_KEY
     );
 
-    res.status(200).json({ message: "Login successful", token });
+    if (!token) {
+      return res.status(400).json({ message: "Token missing" });
+    }
+
+    res.status(200).json({ message: "login successful", token });
   } catch (error) {
-    res.status(500).json({ message: "Server error!! failed to login" });
+    res.status(500).json({ message: error.message });
   }
 };
